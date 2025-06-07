@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <title>Teste de Grafos</title>
+</head>
+<body>
+  <h1>Teste de DFS e BFS</h1>
+  <button onclick="executar('dfs')">Executar DFS</button>
+  <button onclick="executar('bfs')">Executar BFS</button>
+  <pre id="resultado"></pre>
+
+  <script>
+    const grafo = {
+      "A": ["B", "C"],
+      "B": ["A", "D"],
+      "C": ["A"],
+      "D": ["B"]
+    };
+
+    function executar(tipo) {
+      fetch(`http://localhost:5000/${tipo}`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          grafo: grafo,
+          inicio: "A"
+        })
+      })
+      .then(res => res.json())
+      .then(data => {
+        document.getElementById("resultado").innerText = JSON.stringify(data, null, 2);
+      })
+      .catch(err => {
+        console.error("Erro:", err);
+      });
+    }
+  </script>
+</body>
+</html>
