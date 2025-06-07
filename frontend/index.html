@@ -2,37 +2,122 @@
 <html lang="pt-br">
 <head>
   <meta charset="UTF-8">
-  <title>Teste de Grafos</title>
+  <title>AC - Análise e Complexidade de Algoritmos</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <h1>Teste de DFS e BFS</h1>
-  <button onclick="executar('dfs')">Executar DFS</button>
-  <button onclick="executar('bfs')">Executar BFS</button>
+  <h1>Execução de Algoritmos em Grafos</h1>
+  <p>Projeto da disciplina de Análise e Complexidade de Algoritmos (IBM3121) - 2025.1</p>
+
+  <div id="controles">
+    <h2>Controles</h2>
+    <label for="graph-select">Escolha um Grafo:</label>
+    <select id="graph-select" onchange="selecionarGrafo()"></select>
+    
+    <label for="start-node-select">Nó Inicial:</label>
+    <select id="start-node-select"></select>
+    
+    <br><br>
+    
+    <button onclick="executar('dfs')">Executar DFS</button>
+    <button onclick="executar('bfs')">Executar BFS</button>
+  </div>
+
+  <div id="info-grafo">
+    <h2>Grafo Selecionado (Lista de Adjacência)</h2>
+    <pre id="grafo-adjacencia"></pre>
+  </div>
+
+  <h2>Resultado do Algoritmo</h2>
   <pre id="resultado"></pre>
 
   <script>
-    const grafo = {
-      "A": ["B", "C"],
-      "B": ["A", "D"],
-      "C": ["A"],
-      "D": ["B"]
+    // Variável global para guardar os dados dos grafos vindos da API
+    let grafosDisponiveis = {};
+
+    // Função executada ao carregar a página
+    window.onload = function() {
+      fetch('http://localhost:5000/grafos')
+        .then(res => res.json())
+        .then(data => {
+          grafosDisponiveis = data;
+          const graphSelect = document.getElementById('graph-select');
+          
+          // Limpa quaisquer opções existentes
+          graphSelect.innerHTML = '<option value="">-- Selecione --</option>';
+
+          // Preenche o dropdown de grafos
+          for (const id in grafosDisponiveis) {
+            const option = document.createElement('option');
+            option.value = id;
+            option.innerText = grafosDisponiveis[id].nome;
+            graphSelect.appendChild(option);
+          }
+        })
+        .catch(err => {
+          console.error("Erro ao buscar grafos:", err);
+          document.getElementById('resultado').innerText = "Falha ao conectar com a API. Verifique se o backend está rodando.";
+        });
     };
 
+    // Função chamada quando um grafo é selecionado no dropdown
+    function selecionarGrafo() {
+      const graphId = document.getElementById('graph-select').value;
+      const startNodeSelect = document.getElementById('start-node-select');
+      startNodeSelect.innerHTML = ''; // Limpa as opções do nó inicial
+
+      if (!graphId) {
+        document.getElementById('grafo-adjacencia').innerText = "Nenhum grafo selecionado.";
+        return;
+      }
+      
+      const nosDoGrafo = grafosDisponiveis[graphId].nos;
+
+      // Preenche o dropdown de nós iniciais
+      nosDoGrafo.forEach(no => {
+        const option = document.createElement('option');
+        option.value = no;
+        option.innerText = no;
+        startNodeSelect.appendChild(option);
+      });
+      
+      // Busca a estrutura completa para exibição (poderíamos ter feito isso na primeira chamada, mas assim é mais limpo)
+      // Para este exemplo, vamos simular, pois já temos os nós. Para exibir a lista, precisamos da estrutura.
+      // Vamos fazer uma nova chamada ou adaptar a primeira para já trazer tudo. Para simplificar, vamos assumir que já temos.
+      // O ideal seria ter um endpoint /grafos/<id> que retorna a estrutura completa.
+      // Por enquanto, vamos apenas exibir que foi selecionado. Para a entrega final, exiba a lista de adjacência.
+      document.getElementById('grafo-adjacencia').innerText = `Exibindo o grafo: "${grafosDisponiveis[graphId].nome}". \n(A exibição da lista de adjacência completa é um próximo passo)`;
+    }
+
+    // Função principal para executar os algoritmos
     function executar(tipo) {
+      const idGrafo = document.getElementById('graph-select').value;
+      const inicio = document.getElementById('start-node-select').value;
+
+      if (!idGrafo || !inicio) {
+        alert("Por favor, selecione um grafo e um nó inicial.");
+        return;
+      }
+
       fetch(`http://localhost:5000/${tipo}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          grafo: grafo,
-          inicio: "A"
+          id_grafo: idGrafo,
+          inicio: inicio
         })
       })
       .then(res => res.json())
       .then(data => {
-        document.getElementById("resultado").innerText = JSON.stringify(data, null, 2);
+        if (data.erro) {
+            document.getElementById('resultado').innerText = `Erro: ${data.erro}`;
+        } else {
+            document.getElementById('resultado').innerText = JSON.stringify(data, null, 2);
+        }
       })
       .catch(err => {
-        console.error("Erro:", err);
+        console.error("Erro na execução:", err);
+        document.getElementById('resultado').innerText = "Ocorreu um erro ao processar a sua solicitação.";
       });
     }
   </script>
