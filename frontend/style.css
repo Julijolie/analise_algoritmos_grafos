@@ -1,38 +1,120 @@
 /* frontend/style.css */
+body {  
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  line-height: 1.6;  
+  padding: 20px;  
+  max-width: 800px;
+  margin: auto;
+  background-color: #f9f9f9;
+} 
 
-body { 
-    font-family: sans-serif; 
-    line-height: 1.6; 
-    padding: 20px; 
-    max-width: 800px; 
-    margin: auto; 
-  }
-  
-  h1, h2 { 
-    color: #333; 
-  }
-  
-  #controles, #info-grafo { 
-    margin-bottom: 20px; 
-    padding: 15px; 
-    border: 1px solid #ddd; 
-    border-radius: 5px; 
-  }
-  
-  label { 
-    margin-right: 10px; 
-  }
-  
-  select, button { 
-    padding: 8px 12px; 
-    font-size: 16px; 
-    margin-right: 10px; 
-  }
-  
-  pre { 
-    background-color: #f4f4f4; 
-    padding: 15px; 
-    border-radius: 5px; 
-    white-space: pre-wrap; 
-    word-wrap: break-word; 
-  }
+h1, h2, h3 {  
+  color: #333;  
+}
+
+h1 {
+  border-bottom: 2px solid #eee;
+  padding-bottom: 10px;
+  text-align: center;
+}
+
+.card {  
+  margin-bottom: 20px;  
+  padding: 20px;  
+  border: 1px solid #ddd;  
+  border-radius: 8px;
+  background-color: #fff;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+#controles-form {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 15px;
+}
+
+label {
+  font-weight: bold;
+}
+
+select, button {
+  font-size: 16px;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+button {
+  background-color: #007bff;
+  color: white;
+}
+
+button:hover {
+  background-color: #0056b3;
+}
+
+.estrutura-container {
+  display: flex;
+  gap: 20px;
+}
+
+.estrutura-coluna {
+  flex: 1;
+}
+
+pre {  
+  background-color: #f4f4f4;  
+  padding: 15px;  
+  border-radius: 5px;  
+  white-space: pre-wrap;  
+  word-wrap: break-word;
+  font-family: "Fira Code", "Courier New", monospace;
+  font-size: 14px;
+  min-height: 200px;
+}
+
+/* NOVO: Estilos para o container da imagem */
+#imagem-container {
+  background-color: #f4f4f4;
+  padding: 10px;
+  border-radius: 5px;
+  min-height: 200px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#imagem-container p {
+  color: #666;
+}
+
+/* NOVO: Estilos para a imagem do grafo */
+#imagem-container img {
+  max-width: 100%;
+  height: auto;
+  border-radius: 4px;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 15px;
+}
+th, td {
+  border: 1px solid #ddd;
+  padding: 10px;
+  text-align: center;
+}
+th {
+  background-color: #f2f2f2;
+  font-weight: bold;
+}
+tbody tr:nth-child(even) {
+  background-color: #f9f9f9;
+}
+.erro {
+  color: #d9534f;
+  font-weight: bold;
+}
