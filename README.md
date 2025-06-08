@@ -1,6 +1,6 @@
 # Sistema de Algoritmos de Grafos
 
-## 📋 Informações do Projeto
+## Informações do Projeto
 
 - **Disciplina:** Análise e Complexidade de Algoritmos (IBM3121)
 - **Professor:** Cassius Figueiredo
@@ -10,19 +10,19 @@
 
 ---
 
-## 👥 Integrante
+## Feito por:
 
 - Juliana de Oliveira - [202203947729]
 
 ---
 
-## 📖 Sobre o Sistema
+## Sobre o Sistema
 
 Este sistema é uma aplicação web (Flask + HTML/JS/CSS) que demonstra a execução dos algoritmos **DFS** e **BFS**. A aplicação permite ao usuário selecionar um dos grafos pré-definidos, escolher um nó inicial e executar os algoritmos de busca. A estrutura do grafo é representada por **listas de adjacência** no backend e visualizada através de **imagens estáticas** no frontend. Os resultados, como ordem de visita, pais e distâncias, são apresentados em tabelas detalhadas.
 
 ---
 
-## 🚀 Como Executar
+## Como Executar
 
 ### Pré-requisitos
 
@@ -57,7 +57,7 @@ Este sistema é uma aplicação web (Flask + HTML/JS/CSS) que demonstra a execu�
 
 ---
 
-## 🎯 Como Usar
+## Como Usar
 
 1.  **Escolher Grafo:** Selecione um grafo no primeiro menu. A sua lista de adjacência e visualização gráfica aparecerão.
 2.  **Escolher Nó Inicial:** Selecione o nó de partida.
@@ -66,7 +66,7 @@ Este sistema é uma aplicação web (Flask + HTML/JS/CSS) que demonstra a execu�
 
 ---
 
-## 🧪 Grafos de Teste
+## Grafos de Teste
 
 O sistema utiliza os dois grafos especificados no enunciado:
 
@@ -75,7 +75,7 @@ O sistema utiliza os dois grafos especificados no enunciado:
 
 ---
 
-## 🔍 Detalhes dos Algoritmos
+## Detalhes dos Algoritmos
 
 Ambos os algoritmos (DFS e BFS) foram implementados para lidar com grafos desconexos, garantindo que todos os nós sejam visitados.
 
