@@ -1,84 +1,75 @@
 # backend/app.py
 from flask import Flask, request, jsonify
-from bd import grafos_disponiveis, bfs, dfs
+from bd import bfs, dfs  # Importa apenas as funções de busca
 from flask_cors import CORS
 
 app = Flask(__name__)
 CORS(app)
 
+# --- Função Auxiliar ---
+def converter_cy_para_adj(graph_data, is_directed=True):
+    """Converte dados do formato Cytoscape.js para uma lista de adjacência."""
+    adj_list = {}
+    nodes = graph_data.get('nodes', [])
+    edges = graph_data.get('edges', [])
+
+    # 1. Inicializa a lista de adjacência com todos os nós (vértices)
+    for node_data in nodes:
+        node_id = node_data.get('data', {}).get('id')
+        if node_id:
+            adj_list[node_id] = []
+
+    # 2. Preenche a lista com as arestas
+    for edge_data in edges:
+        source = edge_data.get('data', {}).get('source')
+        target = edge_data.get('data', {}).get('target')
+        if source in adj_list and target in adj_list:
+            adj_list[source].append(target)
+            # Se o grafo não for direcionado, adiciona a aresta de volta
+            if not is_directed:
+                adj_list[target].append(source)
+    return adj_list
+
+# --- Rota Principal da API ---
+
 @app.route('/')
 def home():
-    return "API de Grafos rodando com sucesso!"
+    return "API de Algoritmos de Grafos pronta para receber dados!"
 
-def formatar_para_cytoscape(grafo_dict, is_directed):
-    """Converte a lista de adjacência para o formato do Cytoscape.js, evitando arestas duplicadas em grafos não-direcionados."""
-    elementos = []
-    # Adiciona os nós
-    for no in grafo_dict.keys():
-        elementos.append({"data": {"id": no}})
-    
-    arestas_adicionadas = set()
-    for no, vizinhos in grafo_dict.items():
-        for vizinho in vizinhos:
-            if is_directed:
-                # Em grafos direcionados, simplesmente adiciona a aresta
-                elementos.append({"data": {"source": no, "target": vizinho}})
-            else:
-                # Em grafos não-direcionados, cria uma chave única para a aresta (ordenada)
-                # para evitar adicionar tanto A-B quanto B-A.
-                edge_key = "-".join(sorted((no, vizinho)))
-                if edge_key not in arestas_adicionadas:
-                    elementos.append({"data": {"source": no, "target": vizinho}})
-                    arestas_adicionadas.add(edge_key)
-    return elementos
-
-@app.route('/grafos', methods=['GET'])
-def get_grafos():
-    """Retorna dados do grafo, incluindo o formato para o Cytoscape."""
-    info_grafos = {}
-    for id, grafo_info in grafos_disponiveis.items():
-        is_directed = "direcionado" in id
-        info_grafos[id] = {
-            "nome": grafo_info["nome"],
-            "nos": list(grafo_info["estrutura"].keys()),
-            "estrutura_adj": grafo_info["estrutura"],
-            "elementos_cy": formatar_para_cytoscape(grafo_info["estrutura"], is_directed)
-        }
-    return jsonify(info_grafos)
-
-def executar_algoritmo(algoritmo_func):
+@app.route('/run-algorithm', methods=['POST'])
+def run_algorithm():
+    """Rota única que recebe os dados do grafo do frontend e executa o algoritmo."""
     dados = request.get_json()
-    id_grafo = dados.get("id_grafo")
-    no_inicial = dados.get("inicio")
-
-    if not id_grafo or not no_inicial:
-        return jsonify({"erro": "ID do grafo ou vértice inicial ausente"}), 400
-
-    grafo_info = grafos_disponiveis.get(id_grafo)
-    if not grafo_info:
-        return jsonify({"erro": f"Grafo com ID '{id_grafo}' não encontrado"}), 404
     
-    grafo_dict = grafo_info["estrutura"]
-        
-    if no_inicial not in grafo_dict:
-        return jsonify({"erro": f"Vértice inicial '{no_inicial}' não existe no grafo selecionado"}), 400
+    # Extrai os dados enviados pelo frontend
+    graph_data = dados.get("graph_data")
+    no_inicial = dados.get("inicio")
+    tipo_algoritmo = dados.get("tipo")
+    is_directed = dados.get("is_directed", True) # Assume direcionado se não especificado
 
-    # Chama a função de busca diretamente, passando o grafo como argumento
+    # Validação básica
+    if not all([graph_data, no_inicial, tipo_algoritmo]):
+        return jsonify({"erro": "Dados insuficientes para executar o algoritmo"}), 400
+    
+    # Converte o grafo do frontend para um formato que as funções entendem
+    grafo_dict = converter_cy_para_adj(graph_data, is_directed)
+
+    # Verifica se o nó inicial existe no grafo criado
+    if no_inicial not in grafo_dict:
+        return jsonify({"erro": f"Vértice inicial '{no_inicial}' não encontrado no grafo criado"}), 400
+
+    # Escolhe a função de busca correta (bfs ou dfs)
+    algoritmo_func = dfs if tipo_algoritmo == 'dfs' else bfs
+    
+    # Executa o algoritmo
     resultado = algoritmo_func(grafo_dict, no_inicial)
-        
+    
+    # Retorna o resultado completo para o frontend
     return jsonify({
         "algoritmo": algoritmo_func.__name__.upper(),
         "no_inicial": no_inicial,
         "resultado": resultado
     })
-
-@app.route('/bfs', methods=['POST'])
-def executar_bfs():
-    return executar_algoritmo(bfs)
-
-@app.route('/dfs', methods=['POST'])
-def executar_dfs():
-    return executar_algoritmo(dfs)
 
 if __name__ == '__main__':
     app.run(debug=True, port=5000)

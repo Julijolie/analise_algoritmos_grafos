@@ -3,12 +3,12 @@ body {
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
   line-height: 1.6;  
   padding: 20px;  
-  max-width: 800px;
+  max-width: 900px;
   margin: auto;
   background-color: #f9f9f9;
 } 
 
-h1, h2, h3 {  
+h1, h2, h3, h4 {  
   color: #333;  
 }
 
@@ -27,41 +27,26 @@ h1 {
   box-shadow: 0 2px 4px rgba(0,0,0,0.05);
 }
 
-#controles-form {
+.control-group {
   display: flex;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 15px;
+  flex-direction: column;
+  gap: 5px;
 }
 
 label {
   font-weight: bold;
+  font-size: 14px;
+  color: #555;
 }
 
-select, button {
-  font-size: 16px;
-  padding: 10px;
+select {
+  height: 38px;
+  font-size: 14px;
   border: 1px solid #ccc;
   border-radius: 5px;
+  padding: 0 10px;
+  background-color: #fff;
   cursor: pointer;
-}
-
-button {
-  background-color: #007bff;
-  color: white;
-}
-
-button:hover {
-  background-color: #0056b3;
-}
-
-.estrutura-container {
-  display: flex;
-  gap: 20px;
-}
-
-.estrutura-coluna {
-  flex: 1;
 }
 
 pre {  
@@ -71,30 +56,8 @@ pre {
   white-space: pre-wrap;  
   word-wrap: break-word;
   font-family: "Fira Code", "Courier New", monospace;
-  font-size: 14px;
-  min-height: 200px;
-}
-
-/* NOVO: Estilos para o container da imagem */
-#imagem-container {
-  background-color: #f4f4f4;
-  padding: 10px;
-  border-radius: 5px;
-  min-height: 200px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-#imagem-container p {
-  color: #666;
-}
-
-/* NOVO: Estilos para a imagem do grafo */
-#imagem-container img {
-  max-width: 100%;
-  height: auto;
-  border-radius: 4px;
+  font-size: 15px;
+  min-height: 230px;
 }
 
 table {
@@ -102,19 +65,131 @@ table {
   border-collapse: collapse;
   margin-top: 15px;
 }
-th, td {
-  border: 1px solid #ddd;
+th, td { border: 1px solid #ddd; padding: 10px; text-align: center; }
+th { background-color: #f2f2f2; font-weight: bold; }
+.erro { color: #d9534f; font-weight: bold; }
+
+/* --- ESTILOS PARA O EDITOR DE GRAFO --- */
+.editor-container {
+  display: flex;
+  height: 500px;
+  padding: 0;
+}
+
+#painel-controlo {
+  width: 300px;
+  padding: 20px;
+  background-color: #f8f9fa;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  border-right: 1px solid #ddd;
+}
+
+.instrucao {
   padding: 10px;
+  background-color: #eef7ff;
+  border-left: 4px solid #007bff;
+  border-radius: 4px;
+  font-size: 14px;
+}
+
+.instrucao h4 { margin: 0 0 5px 0; }
+.instrucao ul { padding-left: 20px; margin: 0; }
+
+#painel-controlo button {
+  padding: 8px 12px;
+  font-size: 14px;
+  height: auto;
+  border: none;
+  transition: background-color 0.2s, transform 0.1s;
+  cursor: pointer;
+  border-radius: 5px;
+}
+
+button:active { transform: scale(0.98); }
+
+.botoes-linha {
+  display: flex;
+  gap: 10px;
+  width: 100%;
+}
+.botoes-linha button {
+  flex: 1;
+}
+
+.btn-add { background-color: #28a745; color: white; }
+.btn-add:hover { background-color: #218838; }
+
+.btn-edge { background-color: #ffc107; color: black; }
+.btn-edge.active { background-color: #e0a800; }
+
+#status-bar {
   text-align: center;
+  padding: 8px;
+  background-color: #e9ecef;
+  border-radius: 5px;
+  font-style: italic;
+  color: #555;
+  height: auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
 }
-th {
-  background-color: #f2f2f2;
-  font-weight: bold;
+
+/* --- ESTILOS ATUALIZADOS --- */
+.checkbox-container {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: auto;      /* Empurra este grupo para o fundo */
+  padding-top: 15px;     /* Adiciona espaço acima */
+  border-top: 1px solid #ddd; /* Cria um separador visual */
 }
-tbody tr:nth-child(even) {
-  background-color: #f9f9f9;
+
+.checkbox-container label {
+  cursor: pointer;
 }
-.erro {
-  color: #d9534f;
-  font-weight: bold;
+
+#cy {
+  flex-grow: 1;
+  height: 100%;
+}
+
+.execucao-panel {
+  display: flex;
+  flex-direction: row;
+  align-items: flex-end; /* Alterado para alinhar pela base */
+  gap: 10px;
+}
+
+.execucao-panel .control-group {
+  width: auto;
+  flex-shrink: 0;
+}
+
+.execucao-panel select,
+.execucao-panel button {
+  height: 32px;
+  font-size: 14px;
+}
+
+.execucao-panel select {
+  width: 80px;
+}
+
+.botoes-execucao {
+  display: flex;
+  gap: 8px;
+  flex-grow: 1;
+}
+
+.btn-exec {
+  flex: 1;
+  background-color: #17a2b8;
+  color: white;
+}
+.btn-exec:hover {
+  background-color: #138496;
 }

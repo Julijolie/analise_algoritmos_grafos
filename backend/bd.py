@@ -1,47 +1,4 @@
-# backend/bd.py
 from collections import deque
-
-# --- Grafos do Projeto (DADOS CORRIGIDOS CONFORME A SUA ESPECIFICAÇÃO) ---
-
-# Grafo 1 (Não-Direcionado) com D,G,H em componente separado.
-grafo_nao_direcionado = {
-    'A': ['B', 'E'],
-    'B': ['A', 'C', 'E'],
-    'E': ['A', 'B', 'F'],
-    'C': ['B', 'F'],
-    'F': ['C', 'E', 'I'],
-    'I': ['F'],
-    'D': ['G', 'H'],
-    'G': ['D', 'H'],
-    'H': ['D', 'G'],
-}
-
-# Grafo 2 (Direcionado)
-grafo_direcionado = {
-    'A': ['B', 'F'],
-    'B': ['D'],
-    'C': ['D', 'H'],
-    'D': ['H'],
-    'E': ['B', 'G'],
-    'F': ['E', 'G'],
-    'G': ['F'],
-    'H': []
-}
-
-# Dicionário para o app acessar os grafos
-grafos_disponiveis = {
-    "nao_direcionado": {
-        "nome": "Grafo 1 - Não-Direcionado",
-        "estrutura": grafo_nao_direcionado
-    },
-    "direcionado": {
-        "nome": "Grafo 2 - Direcionado",
-        "estrutura": grafo_direcionado
-    }
-}
-
-
-# --- Funções de Busca (CORRIGIDAS PARA EXPLORAR TODOS OS COMPONENTES) ---
 
 def dfs(grafo, inicio):
     """Executa a Busca em Profundidade (DFS) a partir de um nó inicial, visitando todos os componentes."""

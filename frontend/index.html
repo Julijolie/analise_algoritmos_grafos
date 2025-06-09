@@ -5,121 +5,210 @@
     <meta charset="UTF-8">
     <title>AC - Análise e Complexidade de Algoritmos</title>
     <link rel="stylesheet" href="style.css">
+    <script src="https://unpkg.com/cytoscape@3.23.0/dist/cytoscape.min.js"></script>
 </head>
 
 <body>
     <h1>Execução de Algoritmos em Grafos 📈</h1>
     <p>Projeto da disciplina de Análise e Complexidade de Algoritmos (IBM3121) - 2025.1</p>
 
-    <div class="card">
-        <h2>Controles</h2>
-        <form id="controles-form">
-            <label for="graph-select">Escolha um Grafo:</label>
-            <select id="graph-select" onchange="selecionarGrafo()"></select>
-
-            <label for="start-node-select">Nó Inicial:</label>
-            <select id="start-node-select"></select>
-
-            <button type="button" onclick="executar('dfs')">Executar DFS</button>
-            <button type="button" onclick="executar('bfs')">Executar BFS</button>
-        </form>
-    </div>
-    
-    <div class="card">
-        <h2>Estrutura do Grafo</h2>
-        <div class="estrutura-container">
-            <div class="estrutura-coluna">
-                <h3>Lista de Adjacência</h3>
-                <pre id="grafo-adjacencia">Selecione um grafo.</pre>
+    <!-- O layout agora é focado no editor e nos resultados -->
+    <div class="editor-container card">
+        <!-- Painel de Controlo do Editor -->
+        <div id="painel-controlo">
+            <h2>Editor de Grafo</h2>
+            <div class="instrucao">
+                <h4>Como usar:</h4>
+                <ul>
+                    <li><strong>Adicionar Nó:</strong> Clique no botão.</li>
+                    <li><strong>Criar Aresta:</strong> Ative o modo "Criar Aresta", depois clique no nó de origem e, em seguida, no de destino.</li>
+                </ul>
             </div>
-            <div class="estrutura-coluna">
-                <!-- O título foi alterado -->
-                <h3>Visualização Gráfica</h3>
-                <!-- O <pre> foi trocado por uma <div> para conter a imagem -->
-                <div id="imagem-container">
-                    <p>Selecione um grafo.</p>
+
+            <!-- Botões de Edição Agrupados -->
+            <div class="botoes-linha">
+                <button id="add-node-btn" class="btn-add">Adicionar Nó</button>
+                <button id="add-edge-btn" class="btn-edge">Criar Aresta</button>
+            </div>
+
+            <!-- CHECKBOX MOVIDO PARA ANTES DA BARRA DE STATUS -->
+            <div class="checkbox-container">
+                <input type="checkbox" id="is-directed-checkbox">
+                <label for="is-directed-checkbox">É um grafo direcionado?</label>
+            </div>
+            
+            <div id="status-bar">
+                <p id="status-text">Pronto</p>
+            </div>
+
+            <!-- Seção de execução movida para dentro do painel -->
+            <div class="execucao-panel">
+                <div class="control-group">
+                    <label for="start-node-select">Nó Inicial:</label>
+                    <select id="start-node-select">
+                        <option value="">Crie um nó primeiro</option>
+                    </select>
+                </div>
+                <div class="botoes-execucao">
+                    <button type="button" onclick="executar('dfs')" class="btn-exec">DFS</button>
+                    <button type="button" onclick="executar('bfs')" class="btn-exec">BFS</button>
                 </div>
             </div>
-        </div>
-    </div>
 
+        </div>
+        <!-- Área do Gráfico -->
+        <div id="cy"></div>
+    </div>
+    
+    <!-- Seção de Resultados -->
     <div class="card">
         <h2>Resultado do Algoritmo</h2>
         <div id="resultado-container">
-            <p id="resultado-placeholder">O resultado da execução aparecerá aqui.</p>
+            <p id="resultado-placeholder">Crie um grafo e execute um algoritmo para ver os resultados.</p>
         </div>
     </div>
 
     <script>
-        let grafosDisponiveis = {};
+        // --- Variáveis Globais ---
+        let cy;
+        let isCreatingEdge = false;
+        let sourceNode = null;
+        let nodeCounter = 1;
 
+        // --- Elementos do DOM ---
+        const startNodeSelect = document.getElementById('start-node-select');
+        const addNodeBtn = document.getElementById('add-node-btn');
+        const addEdgeBtn = document.getElementById('add-edge-btn');
+        const statusText = document.getElementById('status-text');
+        const isDirectedCheckbox = document.getElementById('is-directed-checkbox');
+        const resultadoContainer = document.getElementById('resultado-container');
+
+        // --- Lógica de Inicialização ---
         window.onload = function() {
-            // A chamada para a API continua a mesma
-            fetch('http://localhost:5000/grafos')
-                .then(res => res.json())
-                .then(data => {
-                    grafosDisponiveis = data;
-                    const graphSelect = document.getElementById('graph-select');
-                    graphSelect.innerHTML = '<option value="">-- Selecione --</option>';
-                    for (const id in grafosDisponiveis) {
-                        const option = document.createElement('option');
-                        option.value = id;
-                        option.innerText = grafosDisponiveis[id].nome;
-                        graphSelect.appendChild(option);
-                    }
-                })
-                .catch(err => {
-                    console.error("Erro ao buscar grafos:", err);
-                    document.getElementById('resultado-placeholder').innerText = "❌ Falha ao conectar com a API.";
-                });
+            cy = cytoscape({
+                container: document.getElementById('cy'),
+                style: [
+                    { selector: 'node', style: {'background-color': '#666', 'label': 'data(id)', 'color': 'white', 'text-valign': 'center', 'text-halign': 'center'} },
+                    { selector: 'edge', style: {'width': 3, 'line-color': '#ccc', 'target-arrow-color': '#ccc', 'target-arrow-shape': 'none', 'curve-style': 'bezier'} },
+                    { selector: 'node:selected', style: {'border-width': 3, 'border-color': '#007bff'} }
+                ]
+            });
+
+            addNodeBtn.addEventListener('click', adicionarNo);
+            addEdgeBtn.addEventListener('click', toggleModoAresta);
+            isDirectedCheckbox.addEventListener('change', atualizarEstiloArestas);
+            cy.on('tap', 'node', manipularCliqueNo);
+            cy.on('tap', (event) => { if (event.target === cy) resetEdgeCreation(); });
         };
+        
+        // --- Funções do Editor ---
+        function adicionarNo() {
+            const newNodeId = `V${nodeCounter}`;
+            cy.add({ group: 'nodes', data: { id: newNodeId }, position: { x: 50 + (nodeCounter * 20), y: 50 + (nodeCounter * 20) } });
+            nodeCounter++;
+            atualizarNosIniciais(newNodeId);
+            resetEdgeCreation();
+        }
 
-        function selecionarGrafo() {
-            const graphId = document.getElementById('graph-select').value;
-            const startNodeSelect = document.getElementById('start-node-select');
-            const adjacenciaDiv = document.getElementById('grafo-adjacencia');
-            // NOVO: Pega o container da imagem
-            const imagemContainer = document.getElementById('imagem-container');
-            
+        function toggleModoAresta() {
+            isCreatingEdge = !isCreatingEdge;
+            if (isCreatingEdge) {
+                updateStatus("Selecione o nó de origem...", true);
+            } else {
+                resetEdgeCreation();
+            }
+        }
+        
+        function manipularCliqueNo(event) {
+            if (!isCreatingEdge) return;
+            const clickedNode = event.target;
+            if (!sourceNode) {
+                sourceNode = clickedNode;
+                sourceNode.select();
+                updateStatus(`Origem: ${sourceNode.id()}. Selecione o destino...`, true);
+            } else {
+                if (sourceNode.id() !== clickedNode.id()) {
+                    cy.add({ group: 'edges', data: { source: sourceNode.id(), target: clickedNode.id() } });
+                    updateStatus(`Aresta criada: ${sourceNode.id()} -> ${clickedNode.id()}`);
+                }
+                resetEdgeCreation();
+            }
+        }
+
+        function atualizarNosIniciais(selecionarNoId) {
             startNodeSelect.innerHTML = '';
-
-            if (!graphId) {
-                adjacenciaDiv.innerText = "Selecione um grafo.";
-                // Limpa o container da imagem
-                imagemContainer.innerHTML = "<p>Selecione um grafo.</p>";
+            const nos = cy.nodes().map(node => node.id());
+            if (nos.length === 0) {
+                startNodeSelect.innerHTML = '<option value="">Crie um nó primeiro</option>';
                 return;
             }
-
-            const grafo = grafosDisponiveis[graphId];
-
-            grafo.nos.forEach(no => {
+            nos.forEach(no => {
                 const option = document.createElement('option');
                 option.value = no;
                 option.innerText = no;
                 startNodeSelect.appendChild(option);
             });
+            if (selecionarNoId && nos.includes(selecionarNoId)) {
+                startNodeSelect.value = selecionarNoId;
+            } else if (nos.length > 0) {
+                startNodeSelect.value = nos[0];
+            }
+        }
 
-            // Preenche a lista de adjacência (continua igual)
-            let adjacenciaTexto = "";
-            for (const no in grafo.estrutura_adj) {
-                adjacenciaTexto += `${no}: [${grafo.estrutura_adj[no].join(", ")}]\n`;
+        function atualizarEstiloArestas() {
+            const isDirected = isDirectedCheckbox.checked;
+            cy.style().selector('edge').style({
+                'target-arrow-shape': isDirected ? 'triangle' : 'none'
+            }).update();
+        }
+
+        function updateStatus(text, isActive = false) {
+            statusText.innerText = text;
+            isActive ? addEdgeBtn.classList.add('active') : addEdgeBtn.classList.remove('active');
+        }
+        
+        function resetEdgeCreation() {
+            isCreatingEdge = false;
+            if (sourceNode) { cy.getElementById(sourceNode.id()).unselect(); sourceNode = null; }
+            updateStatus("Pronto");
+        }
+
+        // --- Lógica de Execução ---
+        function executar(tipo) {
+            const inicio = startNodeSelect.value;
+            const graphData = cy.json().elements;
+            
+            if (!graphData.nodes || graphData.nodes.length === 0 || !inicio) {
+                alert("Por favor, crie um grafo com pelo menos um nó e selecione um nó inicial.");
+                return;
             }
-            adjacenciaDiv.innerText = adjacenciaTexto.trim();
+
+            resultadoContainer.innerHTML = "<p>Processando...</p>";
+
+            const payload = {
+                graph_data: graphData,
+                inicio: inicio,
+                tipo: tipo,
+                is_directed: isDirectedCheckbox.checked
+            };
             
-            // --- LÓGICA PARA EXIBIR A IMAGEM ---
-            imagemContainer.innerHTML = ''; // Limpa o texto "Selecione um grafo"
-            const img = document.createElement('img');
-            
-            // Define qual imagem carregar baseado no ID do grafo
-            if (graphId === 'nao_direcionado') {
-                img.src = 'imgGrafos/naoDirecionado.png';
-                img.alt = 'Grafo não-direcionado';
-            } else if (graphId === 'direcionado') {
-                img.src = 'imgGrafos/direcionado.png';
-                img.alt = 'Grafo direcionado';
-            }
-            
-            imagemContainer.appendChild(img);
+            fetch(`http://localhost:5000/run-algorithm`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(payload)
+            })
+            .then(res => res.json())
+            .then(data => {
+                if (data.erro) {
+                    resultadoContainer.innerHTML = `<p class="erro">Erro: ${data.erro}</p>`;
+                } else {
+                    resultadoContainer.innerHTML = formatarResultado(data);
+                }
+            })
+            .catch(err => {
+                console.error("Erro na execução:", err);
+                resultadoContainer.innerHTML = "<p class='erro'>Ocorreu um erro ao processar a sua solicitação.</p>";
+            });
         }
 
         function formatarResultado(data) {
@@ -138,36 +227,6 @@
             }
             html += "</tbody></table>";
             return html;
-        }
-
-        function executar(tipo) {
-            const idGrafo = document.getElementById('graph-select').value;
-            const inicio = document.getElementById('start-node-select').value;
-            const resultadoContainer = document.getElementById('resultado-container');
-
-            if (!idGrafo || !inicio) {
-                alert("Por favor, selecione um grafo e um nó inicial.");
-                return;
-            }
-
-            resultadoContainer.innerHTML = "<p>Processando...</p>";
-            fetch(`http://localhost:5000/${tipo}`, {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ id_grafo: idGrafo, inicio: inicio })
-                })
-                .then(res => res.json())
-                .then(data => {
-                    if (data.erro) {
-                        resultadoContainer.innerHTML = `<p class="erro">Erro: ${data.erro}</p>`;
-                    } else {
-                        resultadoContainer.innerHTML = formatarResultado(data);
-                    }
-                })
-                .catch(err => {
-                    console.error("Erro na execução:", err);
-                    resultadoContainer.innerHTML = "<p class='erro'>Ocorreu um erro ao processar a sua solicitação.</p>";
-                });
         }
     </script>
 </body>

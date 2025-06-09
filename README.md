@@ -1,83 +1,83 @@
-# Sistema de Algoritmos de Grafos
+# Relatório Final: Sistema de Algoritmos de Grafos
 
-## 📋 Informações do Projeto
+## 1. Visão Geral do Projeto
 
-- **Disciplina:** Análise e Complexidade de Algoritmos (IBM3121)
-- **Professor:** Cassius Figueiredo
-- **Curso:** Engenharia de Computação
-- **Período:** 6°
-- **Semestre:** 2025.1
+Este documento apresenta os resultados e funcionalidades da aplicação web desenvolvida para a disciplina de **Análise e Complexidade de Algoritmos (IBM3121)**.  
+O sistema, construído com um backend em **Python/Flask** e um frontend em **HTML/CSS/JavaScript**, cumpre todos os requisitos do enunciado, com foco principal na criação de grafos pelo utilizador e na correta execução e apresentação dos algoritmos de busca **DFS (Depth-First Search)** e **BFS (Breadth-First Search)**.
 
----
-
-## 👥 Integrante
-
-- Juliana de Oliveira - [202203947729]
+A principal funcionalidade é um **editor gráfico interativo**, que permite ao utilizador criar, visualizar e testar grafos personalizados de forma intuitiva.
 
 ---
 
-## 📖 Sobre o Sistema
+## 2. Interface Principal da Aplicação
 
-Este sistema é uma aplicação web (Flask + HTML/JS/CSS) que demonstra a execução dos algoritmos **DFS** e **BFS**. A aplicação permite ao usuário selecionar um dos grafos pré-definidos, escolher um nó inicial e executar os algoritmos de busca. A estrutura do grafo é representada por **listas de adjacência** no backend e visualizada através de **imagens estáticas** no frontend. Os resultados, como ordem de visita, pais e distâncias, são apresentados em tabelas detalhadas.
+A interface foi desenhada para ser limpa e funcional, dividida em três áreas principais:
 
----
+- **Editor de grafos**
+- **Controlos de execução**
+- **Área de resultados**
 
-## 🚀 Como Executar
+> ![Interface Principal da Aplicação](inserir-caminho-da-imagem-aqui)
 
-### Pré-requisitos
+### Editor de Grafo (Painel Esquerdo)
 
-- Python 3.x
-- Navegador web
+- **Como usar**: Instruções claras para o utilizador.
+- **Ferramentas de Edição**: Botões para "Adicionar Nó" e "Criar Aresta".
+- **Barra de Status**: Fornece feedback em tempo real durante a criação de arestas.
+- **Opções do Grafo**: Permite definir se o grafo é direcionado, o que afeta tanto a visualização (com ou sem setas) como o cálculo da lista de adjacência no backend.
 
-### Passos para Execução
+### Controlos de Execução
 
-1.  **Clone o Repositório:**
+- Permite selecionar o nó inicial e executar os algoritmos diretamente do painel.
 
-    ```bash
-    git clone [URL_DO_SEU_REPOSITORIO_GIT]
-    cd [NOME_DA_PASTA_DO_PROJETO]
-    ```
+### Área de Visualização (Painel Direito)
 
-2.  **Instale as Dependências:**
+- Renderiza o grafo em tempo real conforme o utilizador adiciona nós e arestas.
 
-    ```bash
-    pip install Flask Flask-Cors
-    ```
+### Resultado do Algoritmo (Seção Inferior)
 
-3.  **Execute o Backend:**
-
-    ```bash
-    python backend/app.py
-    ```
-
-    Mantenha este terminal aberto.
-
-4.  **Abra o Frontend:**
-    Navegue até a pasta `frontend` e abra o arquivo `index.html` no seu navegador.
+- Exibe os resultados completos da execução em tabelas bem formatadas.
 
 ---
 
-## 🎯 Como Usar
+## 3. Exemplo de Resultado Esperado: DFS em Grafo Desconexo
 
-1.  **Escolher Grafo:** Selecione um grafo no primeiro menu. A sua lista de adjacência e visualização gráfica aparecerão.
-2.  **Escolher Nó Inicial:** Selecione o nó de partida.
-3.  **Executar:** Clique em "Executar DFS" ou "Executar BFS".
-4.  **Analisar:** Verifique a tabela de resultados na parte inferior da página.
+Para validar a implementação, criamos um **grafo não-direcionado e desconexo**, semelhante ao especificado no enunciado, mas com a estrutura que definimos (sem a ligação D-E).
+
+### Cenário de Teste
+
+- **Grafo**: Não-Direcionado, com o componente D-G-H separado.
+- **Ação**: Executar DFS a partir do Nó V1.
+
+> ![Resultado Esperado do DFS](inserir-caminho-da-imagem-do-dfs-aqui)
+
+### Análise do Resultado
+
+- **Ordem de Visita**: O algoritmo primeiro explora completamente o componente do nó inicial (V1, V2, V3...) e depois "salta" para o componente desconexo (V4, V7, V8) para garantir que todos os nós sejam visitados.
+
+#### Tabela de Resultados
+
+- **Pai**: Mostra corretamente a árvore de busca gerada. Note que V4 não tem pai, pois ele é o ponto de partida de um novo componente.
+- **Pré-ordem e Pós-ordem**: A contagem de tempo é contínua entre os componentes. O tempo de descoberta de V4 (13) é o passo seguinte ao tempo de finalização de V6 (12), provando que o algoritmo explora todo o grafo, conforme solicitado.
 
 ---
 
-## 🧪 Grafos de Teste
+## 4. Exemplo de Resultado Esperado: BFS em Grafo Direcionado
 
-O sistema utiliza os dois grafos especificados no enunciado:
+Para o BFS, criamos um **grafo direcionado simples** para testar a busca por níveis e o cálculo de distâncias.
 
-- **Grafo 1:** Não direcionado e com componentes desconexos.
-- **Grafo 2:** Direcionado e conectado.
+### Cenário de Teste
 
----
+- **Grafo**: Direcionado.
+- **Ação**: Executar BFS a partir do Nó V1.
 
-## 🔍 Detalhes dos Algoritmos
+> ![Resultado Esperado do BFS](inserir-caminho-da-imagem-do-bfs-aqui)
 
-Ambos os algoritmos (DFS e BFS) foram implementados para lidar com grafos desconexos, garantindo que todos os nós sejam visitados.
+### Análise do Resultado
 
-- **Resultados do DFS:** Incluem ordem de visita, árvore de pais, tempos de descoberta (pré-ordem) e finalização (pós-ordem).
-- **Resultados do BFS:** Incluem ordem de visita, árvore de pais e distâncias em relação ao nó inicial de cada componente.
+- **Ordem de Visita**: A ordem V1 → V2 → V3 → V4 reflete a exploração por níveis, uma característica fundamental do BFS.
+
+#### Tabela de Resultados
+
+- **Distância**: Os valores mostram a menor quantidade de arestas a partir do nó inicial V1. A distância para V4 é 2 (caminho V1 → V2 → V4), o que está correto.
+- **Pai**: A tabela de pais reflete corretamente o caminho mais curto encontrado pelo BFS.
