@@ -1,83 +1,62 @@
-# Relatório Final: Sistema de Algoritmos de Grafos
+# Sistema de Algoritmos de Grafos
 
-## 1. Visão Geral do Projeto
+## 📋 Informações Gerais
 
-Este documento apresenta os resultados e funcionalidades da aplicação web desenvolvida para a disciplina de **Análise e Complexidade de Algoritmos (IBM3121)**.  
-O sistema, construído com um backend em **Python/Flask** e um frontend em **HTML/CSS/JavaScript**, cumpre todos os requisitos do enunciado, com foco principal na criação de grafos pelo utilizador e na correta execução e apresentação dos algoritmos de busca **DFS (Depth-First Search)** e **BFS (Breadth-First Search)**.
-
-A principal funcionalidade é um **editor gráfico interativo**, que permite ao utilizador criar, visualizar e testar grafos personalizados de forma intuitiva.
-
----
-
-## 2. Interface Principal da Aplicação
-
-A interface foi desenhada para ser limpa e funcional, dividida em três áreas principais:
-
-- **Editor de grafos**
-- **Controlos de execução**
-- **Área de resultados**
-
-> ![Interface Principal da Aplicação](inserir-caminho-da-imagem-aqui)
-
-### Editor de Grafo (Painel Esquerdo)
-
-- **Como usar**: Instruções claras para o utilizador.
-- **Ferramentas de Edição**: Botões para "Adicionar Nó" e "Criar Aresta".
-- **Barra de Status**: Fornece feedback em tempo real durante a criação de arestas.
-- **Opções do Grafo**: Permite definir se o grafo é direcionado, o que afeta tanto a visualização (com ou sem setas) como o cálculo da lista de adjacência no backend.
-
-### Controlos de Execução
-
-- Permite selecionar o nó inicial e executar os algoritmos diretamente do painel.
-
-### Área de Visualização (Painel Direito)
-
-- Renderiza o grafo em tempo real conforme o utilizador adiciona nós e arestas.
-
-### Resultado do Algoritmo (Seção Inferior)
-
-- Exibe os resultados completos da execução em tabelas bem formatadas.
+- **Disciplina:** Análise e Complexidade de Algoritmos (IBM3121)
+- **Professor:** Cassius Figueiredo
+- **Curso:** Engenharia de Computação
+- **Semestre:** 2025.1
+- **Feito por:**
+  - Juliana de Oliveira - [202203947729]
 
 ---
 
-## 3. Exemplo de Resultado Esperado: DFS em Grafo Desconexo
+## 📖 Informações Relevantes sobre a Aplicação
 
-Para validar a implementação, criamos um **grafo não-direcionado e desconexo**, semelhante ao especificado no enunciado, mas com a estrutura que definimos (sem a ligação D-E).
+Este projeto é uma aplicação web desenvolvida para a demonstração interativa dos algoritmos de busca **DFS (Depth-First Search)** e **BFS (Breadth-First Search)**.
 
-### Cenário de Teste
+A principal funcionalidade é um **editor gráfico visual** que permite ao utilizador criar o seu próprio grafo do zero, adicionando nós e arestas de forma intuitiva. O sistema permite ainda definir se o grafo criado é **direcionado ou não-direcionado**, ajustando a visualização e o comportamento das buscas de acordo.
 
-- **Grafo**: Não-Direcionado, com o componente D-G-H separado.
-- **Ação**: Executar DFS a partir do Nó V1.
+A arquitetura é composta por:
 
-> ![Resultado Esperado do DFS](inserir-caminho-da-imagem-do-dfs-aqui)
-
-### Análise do Resultado
-
-- **Ordem de Visita**: O algoritmo primeiro explora completamente o componente do nó inicial (V1, V2, V3...) e depois "salta" para o componente desconexo (V4, V7, V8) para garantir que todos os nós sejam visitados.
-
-#### Tabela de Resultados
-
-- **Pai**: Mostra corretamente a árvore de busca gerada. Note que V4 não tem pai, pois ele é o ponto de partida de um novo componente.
-- **Pré-ordem e Pós-ordem**: A contagem de tempo é contínua entre os componentes. O tempo de descoberta de V4 (13) é o passo seguinte ao tempo de finalização de V6 (12), provando que o algoritmo explora todo o grafo, conforme solicitado.
+- **Backend:** Uma API em **Python** com o micro-framework **Flask**, responsável por receber a estrutura do grafo criado pelo utilizador, convertê-la para uma **lista de adjacência**, executar os algoritmos e retornar os resultados.
+- **Frontend:** Uma interface desenvolvida em **HTML, CSS e JavaScript**, que utiliza a biblioteca **Cytoscape.js** para renderizar o editor gráfico e apresenta os resultados dos algoritmos em tabelas formatadas.
 
 ---
 
-## 4. Exemplo de Resultado Esperado: BFS em Grafo Direcionado
+## 🚀 Instruções Detalhadas de Execução
 
-Para o BFS, criamos um **grafo direcionado simples** para testar a busca por níveis e o cálculo de distâncias.
+### Pré-requisitos
 
-### Cenário de Teste
+- Python 3.x
+- Pip (gerenciador de pacotes do Python)
+- Navegador web(Google Chrome, Firefox, etc.)
 
-- **Grafo**: Direcionado.
-- **Ação**: Executar BFS a partir do Nó V1.
+### Passos para Execução
 
-> ![Resultado Esperado do BFS](inserir-caminho-da-imagem-do-bfs-aqui)
+1.  **Clonar o Repositório**
+    Abra um terminal ou prompt de comando e clone o repositório do projeto para a sua máquina local:
 
-### Análise do Resultado
+    ```bash
+    git clone [URL_DO_SEU_REPOSITORIO_GIT]
+    cd [NOME_DA_PASTA_DO_PROJETO]
+    ```
 
-- **Ordem de Visita**: A ordem V1 → V2 → V3 → V4 reflete a exploração por níveis, uma característica fundamental do BFS.
+2.  **Instalar as Dependências**
+    Navegue até a pasta raiz do projeto no seu terminal e instale as bibliotecas Python necessárias com o seguinte comando:
 
-#### Tabela de Resultados
+    ```bash
+    pip install Flask Flask-Cors
+    ```
 
-- **Distância**: Os valores mostram a menor quantidade de arestas a partir do nó inicial V1. A distância para V4 é 2 (caminho V1 → V2 → V4), o que está correto.
-- **Pai**: A tabela de pais reflete corretamente o caminho mais curto encontrado pelo BFS.
+3.  **Executar o Servidor Backend**
+    Ainda no terminal, execute o servidor Flask. Este comando iniciará a API que o frontend precisa para funcionar.
+
+    ```bash
+    python backend/app.py
+    ```
+
+    O terminal deverá exibir uma mensagem indicando que o servidor está rodando em `http://127.0.0.1:5000`. **É crucial que este terminal permaneça aberto** durante todo o uso da aplicação.
+
+4.  **Abrir a Aplicação no Navegador**
+    Com o servidor backend em execução, navegue até a pasta `frontend` no seu explorador de arquivos e abra o arquivo `index.html` com o seu navegador de preferência. A aplicação estará pronta para ser usada.
